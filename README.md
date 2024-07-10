@@ -1,1 +1,1 @@
-# byoc
+# BYOC setup scripts
