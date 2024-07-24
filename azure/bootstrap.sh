@@ -89,4 +89,4 @@ az account show --query '{ tenantId: tenantId, subscriptionId: id }' --output js
 
 echo "Role assignment completed."
 
-echo "Bootstrap successful."
+echo "Bootstrap successful. Please send the created accountinfo.json to the BentoML team."
