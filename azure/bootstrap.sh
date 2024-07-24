@@ -79,7 +79,6 @@ if [ -z "$existingSP" ]; then
 	echo "Creating service principal and assigning custom role..."
 	spOutput=$(az ad sp create --id d0e2f715-76af-469a-96b9-7d9d9a62b741)
 
-	echo "$spOutput" | jq '. += { subscriptionId: "'"$subscriptionId"'" }' >> bcAdminSP.json
   existingSP=$(echo "$spOutput" | jq '.appId')
 
 fi
