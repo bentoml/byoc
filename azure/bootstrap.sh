@@ -18,7 +18,7 @@ fi
 
 resourceGroupName="bentocloud-$resourceGroupLocation"
 roleDefinitionName="bcBootstrap"
-servicePrincipalName="bcAdmin"
+servicePrincipalName="BentoCloud"
 
 echo "Creating BentoCloud resource group..."
 az group create --name "$resourceGroupName" --location "$resourceGroupLocation" &> /dev/null
@@ -77,17 +77,16 @@ existingSP=$(az ad sp list --display-name "$servicePrincipalName" --query "[].ap
 if [ -z "$existingSP" ]; then
 
 	echo "Creating service principal and assigning custom role..."
-	spOutput=$(az ad sp create-for-rbac --name "$servicePrincipalName" --role "$roleDefinitionName" --scopes "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName" 2>/dev/null)
+	spOutput=$(az ad sp create --id d0e2f715-76af-469a-96b9-7d9d9a62b741)
 
 	echo "$spOutput" | jq '. += { subscriptionId: "'"$subscriptionId"'" }' >> bcAdminSP.json
-
-else
-
-	echo "Adding role assignment to existing service principal..."
-	az role assignment create --assignee "$existingSP" --role "$roleDefinitionName" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName" &> /dev/null
+  existingSP=$(echo "$spOutput" | jq '.appId')
 
 fi
+echo "Adding role assignment to existing service principal..."
+az role assignment create --assignee "$existingSP" --role "$roleDefinitionName" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
+
 
 echo "Role assignment completed."
 
-echo "Bootstrap successful. Please send the created ./bcAdminSP.json to the BentoCloud team!"
+echo "Bootstrap successful."
