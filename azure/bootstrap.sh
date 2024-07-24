@@ -85,8 +85,12 @@ fi
 echo "Adding role assignment to existing service principal..."
 az role assignment create --assignee "$existingSP" --role "$roleDefinitionName" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
 
-az account show --query '{ tenantId: tenantId, subscriptionId: id }' --output json | jq '. += { region: "'"$resourceGroupLocation"'" }' > accountinfo.json
-
 echo "Role assignment completed."
 
-echo "Bootstrap successful. Please send the created accountinfo.json to the BentoML team."
+az account show --query '{ tenantId: tenantId, subscriptionId: id }' --output json | jq '. += { region: "'"$resourceGroupLocation"'" }' > account_info.json
+
+echo "Bootstrap successful! Non-sensitive information including subscription ID, tenant ID, and region have been saved to the 'account_info.json' file with the followig content."
+
+cat account_info.json
+
+echo "Please send the created 'account_info.json' file to the BentoML team."
