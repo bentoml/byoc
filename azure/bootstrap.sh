@@ -99,4 +99,4 @@ az provider register --namespace "Microsoft.ManagedIdentity"
 az provider register --namespace "Microsoft.ContainerService"
 az provider register --namespace "Microsoft.ContainerRegistry"
 
-echo "Bootstrap successful. Please send the created ./bcAdminSP.json to the BentoCloud team!"
+echo "Bootstrap successful. Please send the created ./bcAdminSP.json to the BentoCloud team through a secure channel!"
