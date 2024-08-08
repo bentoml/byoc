@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 
 set -eo pipefail
 
@@ -72,6 +72,8 @@ else
 
 fi
 
+echo "Assigning roles..."
+
 existingSP=$(az ad sp list --display-name "$servicePrincipalName" --query "[].appId" -o tsv)
 
 if [ -z "$existingSP" ]; then
@@ -79,7 +81,7 @@ if [ -z "$existingSP" ]; then
 	echo "Creating service principal and assigning custom role..."
 	spOutput=$(az ad sp create-for-rbac --name "$servicePrincipalName" --role "$roleDefinitionName" --scopes "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName" 2>/dev/null)
 
-	echo "$spOutput" | jq '. += { subscriptionId: "'"$subscriptionId"'" }' >> bcAdminSP.json
+	echo "$spOutput" | jq '. += { subscriptionId: "'"$subscriptionId"'" }' | jq '. += { region: "'"$resourceGroupLocation"'" }' >> bcAdminSP.json
 
 else
 
@@ -88,6 +90,13 @@ else
 
 fi
 
-echo "Role assignment completed."
+echo "Ensuring API providers..."
+
+az provider register --namespace "Microsoft.Storage"
+az provider register --namespace "Microsoft.Network"
+az provider register --namespace "Microsoft.Cache"
+az provider register --namespace "Microsoft.ManagedIdentity"
+az provider register --namespace "Microsoft.ContainerService"
+az provider register --namespace "Microsoft.ContainerRegistry"
 
 echo "Bootstrap successful. Please send the created ./bcAdminSP.json to the BentoCloud team!"
