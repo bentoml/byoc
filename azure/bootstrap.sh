@@ -16,8 +16,15 @@ else
 	resourceGroupLocation="$1"
 fi
 
+generate_guid() {
+	local inputString="${subscriptionId}-bcBootstrap"
+	local hash="$(<<< "$inputString" md5sum | cut -d' ' -f1)"
+	local guid="${hash:0-8}-${hash:8:4}-${hash:12:4}-${hash-20:12}"
+	echo "$guid"
+}
+
 resourceGroupName="bentocloud-$resourceGroupLocation"
-roleDefinitionName="bcBootstrap"
+roleDefinitionName="$(generate_guid "$subscriptionId")"
 servicePrincipalName="BentoCloud"
 
 echo "Creating BentoCloud resource group..."
@@ -58,21 +65,21 @@ roleDefinition=$(cat <<EOF
 EOF
 								 )
 
-existingRole=$(az role definition list --name "$roleDefinitionName" --query "[].name" -o tsv)
+existingRole=$(az role definition list --name "$roleDefinitionName" --query "[].name" -o tsv | head -n 1)
 
 if [ -z "$existingRole" ]; then
 
 	echo "Creating BentoCloud Bootstrap role..."
-	az role definition create --role-definition "$roleDefinition" &> /dev/null
+	az role definition create --role-definition "$roleDefinition" --only-show-errors
 
 else
 
 	echo "Updating BentoCloud Bootstrap role..."
-	az role definition update --role-definition "$roleDefinition" &> /dev/null
+	az role definition update --role-definition "$roleDefinition" --only-show-errors
 
 fi
 
-existingSP=$(az ad sp list --display-name "$servicePrincipalName" --query "[].appId" -o tsv)
+existingSP=$(az ad sp list --filter "displayname eq '$servicePrincipalName'" --query "[].appId" -o tsv | tail -n 1)
 
 if [ -z "$existingSP" ]; then
 
@@ -82,7 +89,7 @@ if [ -z "$existingSP" ]; then
   existingSP=$(echo "$spOutput" | jq '.appId')
 
 fi
-echo "Adding role assignment to existing service principal..."
+echo "Adding role assignment to service principal..."
 az role assignment create --assignee "$existingSP" --role "$roleDefinitionName" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName"
 
 az account show --query '{ tenantId: tenantId, subscriptionId: id }' --output json | jq '. += { region: "'"$resourceGroupLocation"'" }' > accountinfo.json
