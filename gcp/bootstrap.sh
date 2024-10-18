@@ -30,4 +30,6 @@ gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:bentoclo
        --role roles/resourcemanager.projectIamAdmin
 gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:bentocloud-admin@$PROJECT.iam.gserviceaccount.com \
        --role roles/iam.serviceAccountUser
+gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:bentocloud-admin@$PROJECT.iam.gserviceaccount.com \
+       --role roles/logging.configWriter
 gcloud iam service-accounts keys create "bentocloud-admin-${PROJECT}.json" --iam-account="bentocloud-admin@${PROJECT}.iam.gserviceaccount.com"
