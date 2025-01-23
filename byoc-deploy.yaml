@@ -1,3 +1,4 @@
 template-file-path: aws/create-bentocloud-copilot-role.json
-parameters: {}
+parameters:
+  BentoCloudCopilot: "arn:aws:iam::303081928216:user/bentocloud-byoc"
 tags: {}
