@@ -1,0 +1,3 @@
+template-file-path: aws/create-bentocloud-copilot-role.json
+parameters: {}
+tags: {}
